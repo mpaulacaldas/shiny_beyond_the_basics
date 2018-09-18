@@ -2,12 +2,14 @@ library(dplyr)
 library(readr)
 library(shiny)
 library(shinydashboard)
+
 ui <- dashboardPage(
   dashboardHeader(title = "Dataset Filter"),
   dashboardSidebar(
     fileInput("file", "Upload a CSV file"),
     textInput("filter", "Enter a valid dplyr filter", placeholder = "e.g. mpg > 30"),
-    actionButton("applyFilter", "Apply filter")
+    actionButton("applyFilter", "Apply filter"),
+    actionButton("saveData", "Save filtered data")
 
   ),
   dashboardBody(
@@ -25,13 +27,17 @@ server <- function(input, output) {
   })
   
   getFilteredData <- reactive({
+    # Here I use the input + isolate() approach. The solution proposed by
+    # instructor (and the one that I recommend) uses eventReactive().
+    input$applyFilter
+    isolatedFilter <- isolate(input$filter)
     # Don't filter anything if no filter is specified.
-    if (!isTruthy(input$filter)) filt <- "TRUE" else filt <- input$filter
+    if (!isTruthy(isolatedFilter)) filt <- "TRUE" else filt <- isolatedFilter
     # Apply the filter
     filter_(dataset(), filt)
   })
   
-  saveFilteredData <- observe({
+  observeEvent(input$saveData, {
     write_csv(getFilteredData(), "filteredData.csv")
   })
   

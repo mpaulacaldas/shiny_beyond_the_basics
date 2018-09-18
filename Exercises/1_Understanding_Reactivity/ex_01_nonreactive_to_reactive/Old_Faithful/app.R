@@ -6,9 +6,10 @@
 # Reactive version
 library(shiny)
 library(ggplot2)
+
 ui <- fluidPage(
   sliderInput("nBins", "Number of histogram bins", 
-              min = 1, max = 50, value = 5),
+              min = 10, max = 100, value = 10, step = 10),
   selectInput("colour", "Select a colour", 
               choices = c("orange", "hotpink", "cornflowerblue")),
   plotOutput("histogram")

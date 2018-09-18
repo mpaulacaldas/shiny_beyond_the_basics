@@ -1,6 +1,7 @@
 library(readr)
 library(readxl)
 library(shiny)
+
 ui <- fluidPage(
   titlePanel("Excel to CSV Converter"),
   fileInput("file", "Upload an Excel file"),
@@ -20,7 +21,7 @@ server <- function(input, output) {
     dataset()
   })
   
-  saveFilteredData <- reactive({
+  observe({
     write_csv(dataset(), "data.csv")
   })
   

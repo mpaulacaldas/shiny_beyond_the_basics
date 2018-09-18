@@ -13,21 +13,26 @@ ui <- dashboardPage(
   ),
   dashboardBody(
     
-    plotOutput("predsplot") 
+    plotOutput("predsplot"),
+    verbatimTextOutput("residuals")
     
   )
 )
 
 server <- function(input, output) {
   
-  output$predsplot <- renderPlot({
-    
+  model <- reactive({
     # Construct model formula and build the model
     modelForm <- paste0("mpg ~ ", paste0(input$predictors, collapse = "+"))
     model <- buildModel(modelForm, data = mtcars)
+  })
+  
+  output$residuals <- renderText({residuals(model())})
+  
+  output$predsplot <- renderPlot({
     
     # Plot residuals
-    ggplot(mtcars, aes(x = mpg, y = predict(model, mtcars))) + 
+    ggplot(mtcars, aes(x = mpg, y = predict(model(), mtcars))) + 
              geom_point(shape = as.numeric(input$plotshape)) + 
       labs(title = input$title, x = "Actual", y = "Predictions")
     

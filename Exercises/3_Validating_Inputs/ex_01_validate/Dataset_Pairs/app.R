@@ -9,7 +9,20 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   getData <- reactive({
+    
+    # Better to put the restrictions in the reactive because of DRY
+    validate(
+      need(input$file$datapath, "Please upload a CSV file.")
+    )
+    
+    if (isTruthy(input$file$datapath)) {
+      validate(
+        need(grepl(".*\\.csv$", input$file$datapath), "File must end in '.csv'")
+      )
+    }
+    
     read.csv(input$file$datapath)
+    
   })
   
   output$pairs <- renderPlot({
@@ -17,6 +30,7 @@ server <- function(input, output) {
   })
   
   output$summary <- renderPrint({
+    req(input$file$datapath)
     summary(getData())
   })
 }
